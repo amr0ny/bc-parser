@@ -4,7 +4,7 @@ WORKDIR /opt/bc-parser
 COPY requirements.txt requirements.txt
 RUN chmod +x .
 
-RUN pip install --upgrade pip \
+RUN --network=host pip install --upgrade pip \
     && pip install -r requirements.txt
 
 COPY . .
