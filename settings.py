@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     write_sheet_name: str
     db_recordset_size: int
     timeout: int
+    log_max_bytes: int = 5*1024*1024
+    parsing_depth: int
     db_schemas: Dict[str, str] = {
         'create_schema': './schemas/create_schema.sql',
         'insert_one': './schemas/insert_one_schema.sql',

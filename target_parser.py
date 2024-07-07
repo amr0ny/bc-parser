@@ -7,8 +7,9 @@ import aiohttp
 
 
 class TargetParser:
-    def __init__(self, base_url: str):
+    def __init__(self, base_url: str, parsing_depth: int = 3):
         self.base_url = base_url
+        self.__parsing_depth = parsing_depth
     
     async def fetch_data(self, query_params: dict[str, Any]) -> dict[str, Any]:
         logger.info('[TargetParser] Starting fetching...')
@@ -28,7 +29,7 @@ class TargetParser:
     async def parse(self, query_params: dict[str, Any]) -> Transaction:
         logger.info(f'[TargetParser] Starting parsing. URL: {self.base_url}\tQuery parameters: {query_params}')
         try:
-            for page in range(1, 3):
+            for page in range(1, self.__parsing_depth):
                 query_params['page'] = page
                 data = await self.fetch_data(query_params)
                 txns = data['txns']
