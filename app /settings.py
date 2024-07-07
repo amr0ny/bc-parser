@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import logging
+from logging.handlers import RotatingFileHandler
 import sqlite3
 from typing import Dict
 
@@ -24,11 +25,19 @@ class Settings(BaseSettings):
         }
 settings = Settings(_env_file = '.env', _env_file_encoding = 'utf-8', _case_sensitive = False) # type: ignore
 
+
+handler = RotatingFileHandler(settings.log_path, maxBytes=5*1024*1024, backupCount=5)  # 5MB, сохраняем до 5 старых файлов
+handler.setLevel(settings.log_level)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
 logging.basicConfig(
-    filename=settings.log_path,
-    level=getattr(logging, settings.log_level.upper(), logging.INFO),
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=settings.log_level,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[handler]
 )
+
 logger = logging.getLogger(__name__)
 
 conn = sqlite3.connect(settings.sqlite_path)
