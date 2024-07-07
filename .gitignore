@@ -79,3 +79,8 @@ ENV/
 # Ignore system-specific Python files
 *.swp
 .DS_Store
+
+
+config/
+.vscode
+*.sqlite
