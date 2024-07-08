@@ -89,7 +89,7 @@ class TargetParser:
         logger.info('[TargetParser] Starting serialization')
         transaction = Transaction(hash=txn.get('transaction_hash'),
                                   name=txn['affected_account_id'],
-                                  quantity=int(txn['delta_amount'])/10e6 if txn.get('delta_amount') is not None else None,
+                                  quantity=int(txn['delta_amount'])/10e5 if txn.get('delta_amount') is not None else None,
                                   age=TimeUtils.ns_delta_to_hours(int(txn['block_timestamp'])) if txn.get('block_timestamp') is not None else None,
                                   claim_period=int(txn['claim_period']) if txn.get('claim_period') is not None and txn.get('claim_period') != '' else None)
         logger.debug(f'[TargetParser] Serialization successful: {transaction.model_dump()}')
