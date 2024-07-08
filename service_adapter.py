@@ -8,6 +8,8 @@ from gspread_formatting import (CellFormat, Color, TextFormat,
                                 ConditionalFormatRule, GridRange, BooleanRule,
                                 BooleanCondition)
 from settings import logger
+from datetime import datetime
+
 
 class ServiceAdapter:
     def __init__(self, service_account_file: str, scopes: list[str], sheet_name: str, worksheet_name: str, headers: Tuple[str, ...]):
@@ -51,6 +53,17 @@ class ServiceUpdater(ServiceAdapter):
             self._apply_formatting()
         except Exception as e:
             logger.error(f'[ServiceUpdater] An error occurred while appending rows: {e}')
+
+    def update_last_updated(self):
+        try:
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            last_column = len(self.headers)+1
+            cell = self._worksheet.cell(1, last_column)
+            cell.value = current_time
+            self._worksheet.update_cell(1, last_column, current_time)
+            logger.debug(f'[ServiceUpdater] Last updated time set: {current_time}')
+        except Exception as e:
+            logger.error(f'[ServiceUpdater] An error occurred while updating last updated time: {e}')
 
     def _apply_formatting(self):
         try:

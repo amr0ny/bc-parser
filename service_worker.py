@@ -32,6 +32,7 @@ class ServiceWorker:
                 self.__updater.clear()
                 for rows in self.__sqlite_adapter.read_all():
                     self.__updater.append_rows(rows)
+                self.__updater.update_last_updated()
             except Exception as e:
                 logger.error(f'[RUNTIME] An error occured: {e}')
             finally:
