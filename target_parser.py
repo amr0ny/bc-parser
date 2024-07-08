@@ -28,7 +28,7 @@ class TargetParser:
                     return {}
 
         
-    async def fetch_txn_data(self, txn_hash: str) -> bool:
+    async def fetch_txn_data(self, txn_hash: str, params: dict[str, str]) -> bool:
         base_url = self.base_urls['txn']
         url = f"{base_url}/{txn_hash}"
         logger.info(f'[TargetParser] Starting fetching. URL: {url}')
@@ -47,7 +47,8 @@ class TargetParser:
                     fts = self._extract_fts(data)
                     if fts:
                         logger.debug(f'[TargetParser] Length of ft objects: {len(fts)}')
-                        return any(ft.get('affected_account_id') == self.principal_account for ft in fts)
+                        if fts[0].get('affected_account_id') == params['affected_account_id']:
+                            return True
                     
             except aiohttp.ClientError as e:
                 logger.error(f"[TargetParser] ClientError while fetching transaction data: {e}")
@@ -78,7 +79,7 @@ class TargetParser:
                 for txn in txns:
                     if txn['cause'] == 'MINT' and txn['involved_account_id'] == None:
                         logger.debug(f'[TargetParser] First entrance found: {txn}')
-                        if await self.fetch_txn_data(txn['transaction_hash']):
+                        if await self.fetch_txn_data(txn['transaction_hash'], txn):
                             return txn
             return { 'affected_account_id': query_params['a'] }
         except Exception as e:
@@ -91,6 +92,6 @@ class TargetParser:
                                   name=txn['affected_account_id'],
                                   quantity=int(txn['delta_amount'])/10e6 if txn.get('delta_amount') is not None else None,
                                   age=TimeUtils.ns_delta_to_hours(int(txn['block_timestamp'])) if txn.get('block_timestamp') is not None else None,
-                                  claim_period=int(txn['claim_period']) if txn.get('claim_period') is not None else None)
+                                  claim_period=int(txn['claim_period']) if txn.get('claim_period') is not None and txn.get('claim_period') != '' else None)
         logger.debug(f'[TargetParser] Serialization successful: {transaction.model_dump()}')
         return transaction
