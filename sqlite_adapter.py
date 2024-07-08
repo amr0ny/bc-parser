@@ -31,7 +31,7 @@ class SQLiteAdapter:
             self.__sqlite_conn.rollback()
             logger.error(f"[SQLiteAdapter] Error truncating table: {e}")
 
-    def upsert_one(self, name, hash=None, quantity=None, age=None):
+    def upsert_one(self, name, hash=None, quantity=None, age=None, claim_period=None):
         try:
             # Check if the record exists
             self.__cursor.execute("SELECT id FROM transactions WHERE name = ?", (name,))
@@ -50,6 +50,10 @@ class SQLiteAdapter:
                 if age is not None:
                     update_fields.append("age = ?")
                     params.append(age)
+                if claim_period is not None:
+                    update_fields.append("claim_period = ?")
+                    params.append(age)
+
                 if not update_fields:
                     logger.warning('[SQLiteAdapter] No fields available for update')
                     return
@@ -59,8 +63,8 @@ class SQLiteAdapter:
                 logger.info(f'[SQLiteAdapter] Row with name {name} updated')
             else:
                 # Insert new record
-                sql_query = "INSERT INTO transactions (name, hash, quantity, age) VALUES (?, ?, ?, ?)"
-                self.__cursor.execute(sql_query, (name, hash, quantity, age))
+                sql_query = "INSERT INTO transactions (name, hash, quantity, age, claim_period) VALUES (?, ?, ?, ?, ?)"
+                self.__cursor.execute(sql_query, (name, hash, quantity, age, claim_period))
                 logger.info(f'[SQLiteAdapter] Row with name {name} inserted')
                 
             self.__sqlite_conn.commit()

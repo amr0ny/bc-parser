@@ -1,1 +1,0 @@
-INSERT INTO transactions (name, hash, quantity, age) VALUES (?, ?, ?, ?)

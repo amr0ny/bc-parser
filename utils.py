@@ -23,20 +23,8 @@ def read_sql_file(file_path):
 
 class TimeUtils:
     @staticmethod
-    def ns_delta_to_str_format(ns: int) -> str:
+    def ns_delta_to_hours(ns: int) -> int:
         delta_time = datetime.now() - datetime.fromtimestamp(ns / 1e9)
-        days = delta_time.days
-        seconds = delta_time.seconds
-        hours, remainder = divmod(seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        parts = []
-        if days > 0:
-            parts.append(f"{days} day{'s' if days != 1 else ''}")
-        if hours > 0:
-            parts.append(f"{hours} hour{'s' if hours != 1 else ''}")
-        if minutes > 0:
-            parts.append(f"{minutes} minute{'s' if minutes != 1 else ''}")
-        if seconds > 0:
-            parts.append(f"{seconds} second{'s' if seconds != 1 else ''}")
-        return ', '.join(parts) if parts else '0 seconds'
-
+        total_seconds = delta_time.total_seconds()
+        hours = total_seconds // 3600
+        return round(hours) 

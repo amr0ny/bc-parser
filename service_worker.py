@@ -38,10 +38,17 @@ class ServiceWorker:
                 await asyncio.sleep(self.timeout)
 
     
-    async def __item_iter_func(self, item: str): 
-        logger.info(f'[Runtime iteration] Proccessing account: {item}')
+    async def __item_iter_func(self, row: list[str]): 
+        item = row[0]
+        additional_params = {'claim_period': row[1]}
+        logger.info(f'[Runtime iteration] Proccessing account: {item}', )
         query_params = {'a': item}
-        transaction = await self.__parser.parse(query_params)
-        self.__sqlite_adapter.upsert_one(transaction.name, hash=transaction.hash, quantity=transaction.quantity, age=transaction.age)
+        data = await self.__parser.parse(query_params)
+        transaction = self.__parser.serialize({**data, **additional_params})
+        self.__sqlite_adapter.upsert_one(transaction.name,
+                                         hash=transaction.hash,
+                                         quantity=transaction.quantity,
+                                         age=transaction.age,
+                                         claim_period=transaction.claim_period)
 
 

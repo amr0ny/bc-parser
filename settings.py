@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     log_path: str
     log_level: str
     sqlite_path: str
-    base_url: str = 'https://api3.nearblocks.io/v1/fts/game.hot.tg/txns'
+    base_urls: dict[str, str] = {'txns': 'https://api3.nearblocks.io/v1/fts/game.hot.tg/txns',
+                                 'txn': 'https://api3.nearblocks.io/v1/txns'}
     read_worksheet_name: str
     write_worksheet_name: str
     read_sheet_name: str
@@ -20,6 +21,7 @@ class Settings(BaseSettings):
     timeout: int
     log_max_bytes: int = 5*1024*1024
     parsing_depth: int
+    principal_account: str
     db_schemas: Dict[str, str] = {
         'create_schema': './schemas/create_schema.sql',
         'insert_one': './schemas/insert_one_schema.sql',

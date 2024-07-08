@@ -2,11 +2,9 @@ from pydantic import BaseModel, field_serializer
 from typing import Optional, Any
 
 class Transaction(BaseModel):
-    hash: Optional[str]
+    hash: Optional[str] = None
     name: str
-    quantity: Optional[float]
-    age: Optional[str]
+    quantity: Optional[float] = None
+    age: Optional[int] = None
+    claim_period: Optional[int] = None
 
-    @field_serializer('quantity')
-    def round_quantity(self, value: Any):
-        return round(value, 5)

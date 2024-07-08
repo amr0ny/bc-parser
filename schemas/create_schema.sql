@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS transactions (
             name TEXT NOT NULL UNIQUE,
             hash CHAR(64),
             quantity FLOAT,
-            age TEXT
+            age INT,
+            claim_period INT
         )

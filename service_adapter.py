@@ -4,7 +4,9 @@ from service_auth import ServiceAuth
 from gspread.utils import ValueInputOption
 from gspread_formatting import (CellFormat, Color, TextFormat,
                                 Borders, Border, format_cell_range,
-                                set_column_widths)
+                                set_column_widths, get_conditional_format_rules,
+                                ConditionalFormatRule, GridRange, BooleanRule,
+                                BooleanCondition)
 from settings import logger
 
 class ServiceAdapter:
@@ -87,10 +89,38 @@ class ServiceUpdater(ServiceAdapter):
 
             # Set column widths
             set_column_widths(self._worksheet, [('A:' + chr(64 + len(self.headers)), 150)])
+            age_column = chr(64 + len(self.headers) - 1)
+            claim_period_column = chr(64 + len(self.headers))
 
-            logger.info('[ServiceUpdater] Formatting applied successfully')
+            # Only apply formatting to rows with content
+            format_range = f'A2:{claim_period_column}{last_row_with_content}'
+
+            green_rule = ConditionalFormatRule(
+                ranges=[GridRange.from_a1_range(format_range, self._worksheet)],
+                booleanRule=BooleanRule(
+                    condition=BooleanCondition('CUSTOM_FORMULA', [f'=${age_column}2<=${claim_period_column}2']),
+                    format=CellFormat(backgroundColor=Color(0.7, 0.9, 0.7))
+                )
+            )
+
+            red_rule = ConditionalFormatRule(
+                ranges=[GridRange.from_a1_range(format_range, self._worksheet)],
+                booleanRule=BooleanRule(
+                    condition=BooleanCondition('CUSTOM_FORMULA', [f'=${age_column}2>${claim_period_column}2']),
+                    format=CellFormat(backgroundColor=Color(0.9, 0.7, 0.7))
+                )
+            )
+
+            # Apply the rules
+            rules = get_conditional_format_rules(self._worksheet)
+            rules.clear()  # Clear existing rules
+            rules.append(green_rule)
+            rules.append(red_rule)
+            rules.save()
+            
+            logger.info('[ServiceUpdater] Conditional formatting applied successfully')
         except Exception as e:
-            logger.error(f'[ServiceUpdater] An error occurred while applying formatting: {e}')
+            logger.error(f'[ServiceUpdater] An error occurred while applying conditional formatting: {e}')
 
 
 class ServiceReader(ServiceAdapter):
@@ -103,7 +133,7 @@ class ServiceReader(ServiceAdapter):
             for row in all_values[1:]:  # Skip the header row
                 if row and row[0].strip():  # Check if the row is not empty and the first cell is not just whitespace
                     logger.debug(f'[ServiceReader] Accepted value: {row}')
-                    yield row[0]
+                    yield row
                 else:
                     logger.debug(f'[ServiceReader] Skipping empty row: {row}')
         except Exception as e:
