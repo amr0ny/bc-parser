@@ -21,7 +21,7 @@ if __name__ == "__main__":
                                          settings.write_worksheet_name,
                                          headers=('name', 'hash', 'quantity', 'age', 'claim_period'))
         sqlite_adapter = SQLiteAdapter(sqlite_conn, settings.db_schemas, settings.db_recordset_size)
-        target_parser = TargetParser(settings.base_urls, parsing_depth=settings.parsing_depth, principal_account=settings.principal_account)
+        target_parser = TargetParser(settings.base_urls, parsing_depth=settings.parsing_depth)
         service_worker = ServiceWorker(target_parser, service_updater, service_reader, sqlite_adapter, settings.timeout)
         logger.info('[Initialization] Done')
         asyncio.run(service_worker.run())

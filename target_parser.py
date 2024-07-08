@@ -7,9 +7,8 @@ import aiohttp
 
 
 class TargetParser:
-    def __init__(self, base_urls: dict[str, str], principal_account: str, parsing_depth: int = 3):
+    def __init__(self, base_urls: dict[str, str], parsing_depth: int = 3):
         self.base_urls = base_urls
-        self.principal_account = principal_account
         self.__parsing_depth = parsing_depth
     
     async def fetch_txns_data(self, query_params: dict[str, Any]) -> dict[str, Any]:

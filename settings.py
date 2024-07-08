@@ -21,7 +21,6 @@ class Settings(BaseSettings):
     timeout: int
     log_max_bytes: int = 5*1024*1024
     parsing_depth: int
-    principal_account: str
     db_schemas: Dict[str, str] = {
         'create_schema': './schemas/create_schema.sql',
         'insert_one': './schemas/insert_one_schema.sql',
