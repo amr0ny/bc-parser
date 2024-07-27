@@ -99,7 +99,7 @@ class TargetParser:
             quantity=int(txn['delta_amount'])/10e5 if txn.get('delta_amount') is not None else None,
             age=TimeUtils.ns_delta_to_hours(int(txn['block_timestamp'])) if txn.get('block_timestamp') is not None else None,
             near_amount=int(txn['near_amount'])/10e24 if txn.get('near_amount') is not None else None,
-            hot_amount=int(txn['hot_amount'])/10e6 if txn.get('hot_amount') is not None else None,
+            hot_amount=int(txn['hot_amount'])/10e5 if txn.get('hot_amount') is not None else None,
             claim_period=int(txn['claim_period']) if txn.get('claim_period') and txn['claim_period'] != '' else None,
 
         )

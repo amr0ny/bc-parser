@@ -105,33 +105,37 @@ class ServiceUpdater(ServiceAdapter):
             age_column = chr(64 + len(self.headers) - 1)
             claim_period_column = chr(64 + len(self.headers))
 
-            # Only apply formatting to rows with content
-            format_range = f'A2:{claim_period_column}{last_row_with_content}'
+            # Only apply conditional formatting if there's more than one row of data
+            if last_row_with_content > 1:
+                format_range = f'A2:{claim_period_column}{last_row_with_content}'
 
-            green_rule = ConditionalFormatRule(
-                ranges=[GridRange.from_a1_range(format_range, self._worksheet)],
-                booleanRule=BooleanRule(
-                    condition=BooleanCondition('CUSTOM_FORMULA', [f'=${age_column}2<=${claim_period_column}2']),
-                    format=CellFormat(backgroundColor=Color(0.7, 0.9, 0.7))
+                green_rule = ConditionalFormatRule(
+                    ranges=[GridRange.from_a1_range(format_range, self._worksheet)],
+                    booleanRule=BooleanRule(
+                        condition=BooleanCondition('CUSTOM_FORMULA', [f'=${age_column}2<=${claim_period_column}2']),
+                        format=CellFormat(backgroundColor=Color(0.7, 0.9, 0.7))
+                    )
                 )
-            )
 
-            red_rule = ConditionalFormatRule(
-                ranges=[GridRange.from_a1_range(format_range, self._worksheet)],
-                booleanRule=BooleanRule(
-                    condition=BooleanCondition('CUSTOM_FORMULA', [f'=${age_column}2>${claim_period_column}2']),
-                    format=CellFormat(backgroundColor=Color(0.9, 0.7, 0.7))
+                red_rule = ConditionalFormatRule(
+                    ranges=[GridRange.from_a1_range(format_range, self._worksheet)],
+                    booleanRule=BooleanRule(
+                        condition=BooleanCondition('CUSTOM_FORMULA', [f'=${age_column}2>${claim_period_column}2']),
+                        format=CellFormat(backgroundColor=Color(0.9, 0.7, 0.7))
+                    )
                 )
-            )
 
-            # Apply the rules
-            rules = get_conditional_format_rules(self._worksheet)
-            rules.clear()  # Clear existing rules
-            rules.append(green_rule)
-            rules.append(red_rule)
-            rules.save()
-            
-            logger.info('[ServiceUpdater] Conditional formatting applied successfully')
+                # Apply the rules
+                rules = get_conditional_format_rules(self._worksheet)
+                rules.clear()  # Clear existing rules
+                rules.append(green_rule)
+                rules.append(red_rule)
+                rules.save()
+
+                logger.info('[ServiceUpdater] Conditional formatting applied successfully')
+            else:
+                logger.info('[ServiceUpdater] No data rows to apply conditional formatting')
+
         except Exception as e:
             logger.error(f'[ServiceUpdater] An error occurred while applying conditional formatting: {e}')
 
