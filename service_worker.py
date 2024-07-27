@@ -18,6 +18,7 @@ class ServiceWorker:
         self.__reader = service_reader
         self.__sqlite_adapter = sqlite_adapter
         self.__parser = parser
+        self.__contract_name = 'game.hot.tg'
         self.timeout = timeout
 
     async def run(self):
@@ -42,14 +43,16 @@ class ServiceWorker:
     async def __item_iter_func(self, row: list[str]): 
         item = row[0]
         additional_params = {'claim_period': row[1]}
-        logger.info(f'[Runtime iteration] Proccessing account: {item}', )
-        query_params = {'a': item}
+        logger.info(f'[Runtime iteration] Proccessing account: {item}')
+        query_params = {'a': item, 'contract_name': self.__contract_name}
         data = await self.__parser.parse(query_params)
         transaction = self.__parser.serialize({**data, **additional_params})
         self.__sqlite_adapter.upsert_one(transaction.name,
                                          hash=transaction.hash,
                                          quantity=transaction.quantity,
                                          age=transaction.age,
+                                         near_amount=transaction.near_amount,
+                                         hot_amount=transaction.hot_amount,
                                          claim_period=transaction.claim_period)
 
 

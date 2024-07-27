@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     log_level: str
     sqlite_path: str
     base_urls: dict[str, str] = {'txns': 'https://api3.nearblocks.io/v1/fts/game.hot.tg/txns',
-                                 'txn': 'https://api3.nearblocks.io/v1/txns'}
+                                 'txn': 'https://api3.nearblocks.io/v1/txns',
+                                 'account': 'https://api3.nearblocks.io/v1/account/'}
     read_worksheet_name: str
     write_worksheet_name: str
     read_sheet_name: str
